@@ -1,0 +1,21 @@
+<div 
+  class="play_area" 
+  *ngIf="currentGame"
+  [ngStyle]="{ 'max-width.px': 50 * currentGame.size.width }"
+>
+  <div 
+    class="item" 
+    *ngFor="let item of currentGame.data; let i=index"
+    [ngClass]="{ 'object': [currentGame.pony, currentGame.domokun, currentGame.exit].indexOf(i) !== -1 }"
+    [ngStyle]="{
+      'border-top': getBorder('top', item, i),
+      'border-bottom': getBorder('bottom', item, i),
+      'border-left': getBorder('left', item, i),
+      'border-right': getBorder('right', item, i)
+    }"
+  >
+    <p class="pony" *ngIf="currentGame.pony === i">P</p>
+    <p class="domokun" *ngIf="currentGame.domokun === i">D</p>
+    <p class="exit" *ngIf="currentGame.exit === i">E</p>
+  </div>
+</div>

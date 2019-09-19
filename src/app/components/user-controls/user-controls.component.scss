@@ -1,0 +1,41 @@
+.heading {
+
+}
+
+.controls_area {
+  display: flex;
+  flex-direction: column;
+  margin: 40px 0;
+
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    padding: 10px;
+    margin-left: 110px;
+    background-color: white;
+    border-radius: 3px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+
+    .arrow {
+      margin: 0;
+
+      &:nth-child(2) {
+        margin: 10px;
+      }
+    }
+  }
+}
+
