@@ -8,10 +8,10 @@
     *ngFor="let item of currentGame.data; let i=index"
     [ngClass]="{ 'object': [currentGame.pony, currentGame.domokun, currentGame.exit].indexOf(i) !== -1 }"
     [ngStyle]="{
-      'border-top': getBorder('top', item, i),
-      'border-bottom': getBorder('bottom', item, i),
-      'border-left': getBorder('left', item, i),
-      'border-right': getBorder('right', item, i)
+      'border-top': getBorder('north', item, i),
+      'border-bottom': getBorder('south', item, i),
+      'border-left': getBorder('west', item, i),
+      'border-right': getBorder('east', item, i)
     }"
   >
     <p class="pony" *ngIf="currentGame.pony === i">P</p>
