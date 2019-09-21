@@ -34,6 +34,7 @@ export class HomeComponent implements OnInit {
     };
     const { maze_id } = await this.mazeService.createMaze(newGameData).toPromise();
 
+    // if we get an id, store it inside localstorage and go to play page
     if (maze_id) {
       this.storage.mazeId = maze_id;
       this.router.navigate(['/play']);

@@ -16,6 +16,8 @@ import { GameOverDialogComponent } from 'src/app/dialogs/game-over/game-over.com
 export class PlayAreaComponent implements OnInit {
   currentGame: Game;
   activeToastId: number;
+  innerWidth: number;
+  innerHeight: number;
 
   constructor(
     private router: Router,
@@ -26,12 +28,17 @@ export class PlayAreaComponent implements OnInit {
     ) { }
 
   ngOnInit() {
+    this.innerWidth = window.innerWidth;
+    this.innerHeight = window.innerHeight;
     this.getCurrentState();
   }
 
   // Listen for keyup events and make req to move the pony
   @HostListener('window:keyup', ['$event'])
   keyupEvent(event: KeyboardEvent) {
+    // don't do anything if there is any dialog opened
+    if (this.dialog.openDialogs.length > 0) { return; }
+
     switch (event.code) {
       case 'ArrowUp': return this.movePony({ direction: 'north' });
       case 'ArrowDown': return this.movePony({ direction: 'south' });
@@ -39,6 +46,29 @@ export class PlayAreaComponent implements OnInit {
       case 'ArrowRight': return this.movePony({ direction: 'east' });
       default: break;
     }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.innerWidth = event.target.innerWidth;
+    this.innerHeight = event.target.innerHeight;
+  }
+
+  /**
+   * Get a dynamic value for the cell size.
+   */
+  getCellSize(): number {
+    const mazeSize = this.innerWidth < this.innerHeight
+      ? this.innerWidth - 80 : this.innerHeight - 80;
+    return mazeSize / this.currentGame.size.width;
+  }
+
+  /**
+   * Get a dynamic value for the font-size inside a cell.
+   */
+  getCellFontSize(): string {
+    const cellSize = this.getCellSize();
+    return cellSize >= 23 ? '16px' : (cellSize >= 10 ? '10px' : '6px');
   }
 
   /**
@@ -71,6 +101,9 @@ export class PlayAreaComponent implements OnInit {
     }
   }
 
+  /**
+   * Open the EndGame dialog and show a message to the user.
+   */
   openEndGameDialog(message: string) {
     const dialogref = this.dialog.open(GameOverDialogComponent, {
       disableClose: true,
