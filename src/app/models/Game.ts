@@ -1,5 +1,5 @@
 export default class Game {
-  id?: string;
+  id: string;
   pony: number;
   domokun: number;
   exit: number;

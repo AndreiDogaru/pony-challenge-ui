@@ -1,28 +1,54 @@
+@import url('https://fonts.googleapis.com/css?family=Heebo:300,400,500,700');
+@import '~ngx-toastr/toastr';
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
 * {
   padding: 0;
   margin: 0;
+  outline: 0;
+  border: 0;
+  font-family: 'Heebo', sans-serif;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
-body {
-  width: 100vw;
-  height: 100vh;
+input,
+textarea,
+button,
+select,
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-app-root {
-  width: 100%;
-  height: 100%;
+.dialog_container .mat-dialog-container {
+  padding: 0;
+  width: 500px;
+  max-width: 100%;
 }
 
-app-user-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  border-bottom: 1px solid;
-  text-align: center;
-}
+  button {
+    cursor: pointer;
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    background-color: #332166;
+    color: white;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 
-app-play-area {
-  flex: 2;
-}
+    &:hover:not(.disabled) {
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    &:active:not(.disabled) {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+// app-user-controls {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   flex: 1;
+//   border-bottom: 1px solid;
+//   text-align: center;
+// }

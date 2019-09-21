@@ -1,0 +1,9 @@
+<div class="dialog_header">
+  <p>Game Over</p>
+  <mat-icon (click)="close()">close</mat-icon>
+</div>
+
+<div class="dialog_body">
+  <p>{{ data.message }}</p>
+  <button (click)=close(true)>Play again</button>
+</div>

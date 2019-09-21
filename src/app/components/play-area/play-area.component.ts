@@ -1,6 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
 
-import Game from '../../models/Game';
+import Game from 'src/app/models/Game';
+import { MazeService } from 'src/app/services/maze.service';
+import { GameOverDialogComponent } from 'src/app/dialogs/game-over/game-over.component';
 
 @Component({
   selector: 'app-play-area',
@@ -10,109 +15,97 @@ import Game from '../../models/Game';
 export class PlayAreaComponent implements OnInit {
   currentGame: Game;
 
-  constructor() { }
+  constructor(
+    private router: Router,
+    private toastr: ToastrService,
+    private dialog: MatDialog,
+    private mazeService: MazeService,
+    ) { }
 
   ngOnInit() {
-    const newGameData = {
-      size: { width: 15, height: 15 },
-      data: [],
-      pony: 0,
-      domokun: 39,
-      exit: 224,
-    };
-    const maze = this.initMaze(newGameData.size);
-    newGameData.data = [...maze];
-    this.currentGame = new Game(newGameData);
-    console.log(this.currentGame)
+    this.initGame();
   }
 
-  initMaze(size: { width: number, height: number }) {
-    const maze = [];
-    for (let i = 0; i < size.width * size.height; i += 1) {
-      maze.push({ walls: ['north', 'west'], isVisited: true });
-    }
-
-    const initialPosition = 0;
-    maze[initialPosition].isVisited = true;
-    return this.generatePath(maze, size.width, initialPosition, [initialPosition]);
-  }
-
-  generatePath(maze: any[], width: number, currentCell: number, stack: any[]) {
-    // Possible directions from currentCell:
-    // 1. North: currentCell - width, if currentCell >= width
-    // 2. South: currentCell + width, if currentCell < maze.length - width
-    // 3. West: currentCell - 1, if currentCell % width !== 0
-    // 4. East: currentCell + 1, if (currentCell + 1) % width !== 0
-
-    const hasUnvisitedCells = maze.find(item => item.isVisited);
-    console.log(hasUnvisitedCells);
-    if (!hasUnvisitedCells) { console.log('1'); return maze.map(cell => cell.walls); }
-    console.log('2');
-
-    // Gather all unvisited neighbours
-    const neighbours = [];
-    if (currentCell >= width && !maze[currentCell - width].isVisited) {
-      // North neighbour
-      neighbours.push(currentCell - width);
-    }
-    if (currentCell < maze.length - width && !maze[currentCell + width].isVisited) {
-      // South neighbour
-      neighbours.push(currentCell + width);
-    }
-    if (currentCell % width !== 0 && !maze[currentCell - 1].isVisited) {
-      // West neighbour
-      neighbours.push(currentCell - 1);
-    }
-    if ((currentCell + 1) % width !== 0 && !maze[currentCell + 1].isVisited) {
-      // East neighbour
-      neighbours.push(currentCell + 1);
-    }
-
-    // If there is no unvisited neighbour, then pop the last cell from the stack
-    if (!neighbours) {
-      stack = stack.splice(stack.length - 1, 1);
-      currentCell = stack[stack.length - 1];
-      return this.generatePath(maze, width, currentCell, stack);
-    }
-
-    // Choose a random neighbour
-    const randomNeighbour = neighbours[Math.floor(Math.random() * neighbours.length)];
-
-    // Mark the index as visited in the maze array
-    maze[randomNeighbour].isVisited = true;
-
-    // Remove wall between selected neighbour and currentCell from maze array
-    switch (randomNeighbour) {
-      case currentCell - width:
-        // remove North wall from currentCell
-        maze[currentCell].walls.splice(maze[currentCell].walls.indexOf('north'), 1);
-        break;
-      case currentCell + width:
-        // remove North wall from cell situated below currentCell
-        maze[currentCell + width].walls.splice(maze[currentCell + width].walls.indexOf('north'), 1);
-        break;
-      case currentCell - 1:
-        // remove West wall from currentCell
-        maze[currentCell].walls.splice(maze[currentCell].walls.indexOf('west'), 1);
-        break;
-      case currentCell + 1:
-        // remove West wall from cell situated on the right side of currentCell
-        maze[currentCell + 1].walls.splice(maze[currentCell + 1].walls.indexOf('west'), 1);
-        break;
+  // Listen for keyup events and make req to move the pony
+  @HostListener('window:keyup', ['$event'])
+  keyupEvent(event: KeyboardEvent) {
+    switch (event.code) {
+      case 'ArrowUp': return this.movePony({ direction: 'north' });
+      case 'ArrowDown': return this.movePony({ direction: 'south' });
+      case 'ArrowLeft': return this.movePony({ direction: 'west' });
+      case 'ArrowRight': return this.movePony({ direction: 'east' });
       default: break;
-
     }
-
-    // Push neighbour to the stack
-    stack.push(randomNeighbour);
-
-    // Make neighbour currentCell
-    currentCell = randomNeighbour;
-
-    // Call this function again
-    return this.generatePath(maze, width, currentCell, stack);
   }
 
+  /**
+   * Make request to move the pony and check the result. If the game is won or over, open a dialog.
+   */
+  async movePony(data: { direction: string }) {
+    const moveResponse = await this.mazeService.makeMove(data, this.currentGame.id).toPromise();
+    console.log(moveResponse);
+
+    if (moveResponse.state === 'active') {
+      const mazeState = await this.mazeService.getMazeState(this.currentGame.id).toPromise();
+      this.currentGame.pony = mazeState.pony[0];
+      this.currentGame.domokun = mazeState.domokun[0];
+      if (moveResponse['state-result'] !== 'Move accepted') {
+        this.toastr.info(moveResponse['state-result']);
+      }
+    } else {
+      this.openEndGameDialog(moveResponse['state-result']);
+    }
+  }
+
+  openEndGameDialog(message: string) {
+    const dialogref = this.dialog.open(GameOverDialogComponent, {
+      disableClose: true,
+      panelClass: 'dialog_container',
+      data: { message }
+    });
+
+    dialogref.afterClosed().subscribe((playAgain: boolean) => {
+      if (playAgain) {
+        this.initGame();
+      } else {
+        this.router.navigate(['/home']);
+      }
+    });
+  }
+
+  /**
+   * Make request to create a new game and get the current state of the maze.
+   */
+  async initGame() {
+    const newGameData = {
+      'maze-width': 15,
+      'maze-height': 15,
+      'maze-player-name': 'Rarity',
+      difficulty: 10
+    };
+    const { maze_id } = await this.mazeService.createMaze(newGameData).toPromise();
+
+    const mazeState = await this.mazeService.getMazeState(maze_id).toPromise();
+
+    this.currentGame = {
+      id: mazeState.maze_id,
+      pony: mazeState.pony[0],
+      domokun: mazeState.domokun[0],
+      exit: mazeState['end-point'][0],
+      size: {
+        width: mazeState.size[0],
+        height: mazeState.size[1]
+      },
+      data: mazeState.data
+    };
+  }
+
+  /**
+   * Get the border of a cell from the maze ( currentGame.data array ).
+   * @param position can be one of `north, south, west, east`
+   * @param item represents one cell of the maze
+   * @param index represents the index of that cell in the maze array
+   */
   getBorder(position: string, item: string[], index: number): string {
     let hasBorder: boolean;
     switch (position) {
@@ -133,4 +126,11 @@ export class PlayAreaComponent implements OnInit {
     }
     return hasBorder ? '1px solid' : 'none';
   }
+}
+
+enum KEY_CODE {
+  UP_ARROW = 38,
+  DOWN_ARROW = 40,
+  RIGHT_ARROW = 39,
+  LEFT_ARROW = 37
 }

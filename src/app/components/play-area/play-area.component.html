@@ -2,11 +2,15 @@
   class="play_area" 
   *ngIf="currentGame"
   [ngStyle]="{ 'max-width.px': 50 * currentGame.size.width }"
->
+  >
   <div 
     class="item" 
     *ngFor="let item of currentGame.data; let i=index"
-    [ngClass]="{ 'object': [currentGame.pony, currentGame.domokun, currentGame.exit].indexOf(i) !== -1 }"
+    [ngClass]="{ 
+      'pony': currentGame.pony === i,
+      'domokun': currentGame.domokun === i,
+      'exit': currentGame.exit === i
+    }"
     [ngStyle]="{
       'border-top': getBorder('north', item, i),
       'border-bottom': getBorder('south', item, i),

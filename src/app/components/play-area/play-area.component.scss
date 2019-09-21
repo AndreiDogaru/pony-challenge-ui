@@ -10,8 +10,14 @@
     width: 50px;
     height: 50px;
 
-    &.object {
-      background-color: #FFF4F0;
+    &.pony {
+      background-color: #FF7DF6;
+    }
+    &.domokun {
+      background-color: #E1E3E1;
+    }
+    &.exit {
+      background-color: #8AE86F;
     }
   }
 }
