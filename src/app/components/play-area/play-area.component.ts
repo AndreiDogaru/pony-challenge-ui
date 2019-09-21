@@ -60,7 +60,7 @@ export class PlayAreaComponent implements OnInit {
   getCellSize(): number {
     const mazeSize = this.innerWidth < this.innerHeight
       ? this.innerWidth - 80 : this.innerHeight - 80;
-    return mazeSize / this.currentGame.size.width;
+    return mazeSize / this.currentGame.width;
   }
 
   /**
@@ -81,23 +81,23 @@ export class PlayAreaComponent implements OnInit {
       this.activeToastId = null;
     }
 
-    const moveResponse = await this.mazeService.makeMove(data, this.currentGame.id).toPromise();
+    const { state, message } = await this.mazeService.makeMove(data, this.currentGame.id).toPromise();
 
-    if (moveResponse.state === 'active') {
+    if (state === 'active') {
       // if the game is active, get new maze state and move pony and domokun accordingly
       const mazeState = await this.mazeService.getMazeState(this.currentGame.id).toPromise();
-      this.currentGame.pony = mazeState.pony[0];
-      this.currentGame.domokun = mazeState.domokun[0];
+      this.currentGame.pony = mazeState.pony;
+      this.currentGame.domokun = mazeState.domokun;
 
-      if (moveResponse['state-result'] !== 'Move accepted') {
+      if (message !== 'Move accepted') {
         // if the move was not accepted, show toast message
-        const toast = this.toastr.info(moveResponse['state-result']);
+        const toast = this.toastr.info(message);
         this.activeToastId = toast.toastId;
       }
 
     } else {
       // if game is not active anymore, open the EndGame dialog
-      this.openEndGameDialog(moveResponse['state-result']);
+      this.openEndGameDialog(message);
     }
   }
 
@@ -126,10 +126,8 @@ export class PlayAreaComponent implements OnInit {
    */
   async restartGame() {
     const newGameData = {
-      'maze-width': this.currentGame.size.width,
-      'maze-height': this.currentGame.size.height,
-      'maze-player-name': 'Rarity',
-      difficulty: 1
+      width: this.currentGame.width,
+      height: this.currentGame.height,
     };
     const { maze_id } = await this.mazeService.createMaze(newGameData).toPromise();
     this.storage.mazeId = maze_id;
@@ -150,17 +148,7 @@ export class PlayAreaComponent implements OnInit {
     const mazeState = await this.mazeService.getMazeState(this.storage.mazeId).toPromise();
 
     // save the new game inside a variable
-    this.currentGame = {
-      id: mazeState.maze_id,
-      pony: mazeState.pony[0],
-      domokun: mazeState.domokun[0],
-      exit: mazeState['end-point'][0],
-      size: {
-        width: mazeState.size[0],
-        height: mazeState.size[1]
-      },
-      data: mazeState.data
-    };
+    this.currentGame = Object.assign(this, mazeState);
   }
 
   /**
@@ -173,16 +161,16 @@ export class PlayAreaComponent implements OnInit {
     let hasBorder: boolean;
     switch (position) {
       case 'north':
-        hasBorder = index < this.currentGame.size.width || item.indexOf('north') !== -1;
+        hasBorder = index < this.currentGame.width || item.indexOf('north') !== -1;
         break;
       case 'south':
-        hasBorder = index >= this.currentGame.size.width * this.currentGame.size.height - this.currentGame.size.width;
+        hasBorder = index >= this.currentGame.width * this.currentGame.height - this.currentGame.width;
         break;
       case 'west':
-        hasBorder = index % this.currentGame.size.width === 0 || item.indexOf('west') !== -1;
+        hasBorder = index % this.currentGame.width === 0 || item.indexOf('west') !== -1;
         break;
       case 'east':
-        hasBorder = (index + 1) % this.currentGame.size.width === 0;
+        hasBorder = (index + 1) % this.currentGame.width === 0;
         break;
       default:
         hasBorder = false;

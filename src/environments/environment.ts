@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://ponychallenge.trustpilot.com/pony-challenge'
+  apiUrl: 'http://localhost:3000'
 };
 
 /*

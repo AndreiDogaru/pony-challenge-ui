@@ -16,8 +16,7 @@ export class MazeService {
 
   /**
    * Make request to create a new maze game.
-   * @typeparam MazeData `maze-width: number`, `maze-height: number`,
-   *  `maze-player-name: string`, `difficulty: number`
+   * @typeparam MazeData `width: number`, `height: number`
    * @returns Object containing `maze_id`
    */
   createMaze(data: MazeData): Observable<any> {
@@ -28,7 +27,7 @@ export class MazeService {
   /**
    * Make request to move the pony.
    * @param direction can be one of `east, west, north, south or stay`
-   * @returns Object containing `maze_id`
+   * @returns Object containing game status and a message
    */
   makeMove(data: { direction: string }, mazeId: string): Observable<any> {
     const url = `${this.baseHref}/${mazeId}`;

@@ -1,8 +1,6 @@
 export default class MazeData {
-  'maze-width': number;
-  'maze-height': number;
-  'maze-player-name': string;
-  difficulty: number;
+  width: number;
+  height: number;
 
   constructor(data: MazeData) {
     Object.assign(this, data);

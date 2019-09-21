@@ -3,8 +3,10 @@ export default class Game {
   pony: number;
   domokun: number;
   exit: number;
-  size: { width: number, height: number; };
+  width: number;
+  height: number;
   data: string[][];
+  state: string;
 
   constructor(data: Game) {
     Object.assign(this, data);

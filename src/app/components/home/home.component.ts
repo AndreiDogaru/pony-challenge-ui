@@ -12,7 +12,6 @@ import { StorageService } from 'src/app/services/storage.service';
 export class HomeComponent implements OnInit {
   width: number;
   height: number;
-  difficulty: number;
 
   constructor(
     private router: Router,
@@ -27,10 +26,8 @@ export class HomeComponent implements OnInit {
    */
   async initGame() {
     const newGameData = {
-      'maze-width': this.width,
-      'maze-height': this.height,
-      'maze-player-name': 'Rarity',
-      difficulty: this.difficulty
+      width: this.width,
+      height: this.height,
     };
     const { maze_id } = await this.mazeService.createMaze(newGameData).toPromise();
 
