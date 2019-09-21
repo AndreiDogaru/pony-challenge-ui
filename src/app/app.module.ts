@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxWebstorageModule } from 'ngx-webstorage';
@@ -13,7 +13,7 @@ import { HomeComponent } from './components/home/home.component';
 import { GameOverDialogComponent } from './dialogs/game-over/game-over.component';
 import { routing } from './app.routing';
 import { StorageService } from './services/storage.service';
-
+import { InterceptorService } from './services/interceptor.service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,7 +32,10 @@ import { StorageService } from './services/storage.service';
     NgxWebstorageModule.forRoot(),
     routing,
   ],
-  providers: [StorageService],
+  providers: [
+    StorageService,
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

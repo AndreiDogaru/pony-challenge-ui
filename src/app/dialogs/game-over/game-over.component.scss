@@ -25,5 +25,9 @@
 
   button {
     margin-top: 20px;
+
+    &.secondary {
+      margin-right: 20px;
+    }
   }
 }

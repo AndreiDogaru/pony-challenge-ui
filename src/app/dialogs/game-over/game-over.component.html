@@ -5,5 +5,9 @@
 
 <div class="dialog_body">
   <p>{{ data.message }}</p>
-  <button (click)=close(true)>Play again</button>
+
+  <div class="action_container">
+    <button class="secondary" (click)=close()>Exit</button>
+    <button (click)=close(true)>Play again</button>
+  </div>
 </div>

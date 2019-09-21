@@ -15,6 +15,7 @@ import { GameOverDialogComponent } from 'src/app/dialogs/game-over/game-over.com
 })
 export class PlayAreaComponent implements OnInit {
   currentGame: Game;
+  activeToastId: number;
 
   constructor(
     private router: Router,
@@ -44,17 +45,28 @@ export class PlayAreaComponent implements OnInit {
    * Make request to move the pony and check the result. If the game is won or over, open a dialog.
    */
   async movePony(data: { direction: string }) {
+    // remove the toast message from screen before making the req
+    if (this.activeToastId) {
+      this.toastr.remove(this.activeToastId);
+      this.activeToastId = null;
+    }
+
     const moveResponse = await this.mazeService.makeMove(data, this.currentGame.id).toPromise();
-    console.log(moveResponse);
 
     if (moveResponse.state === 'active') {
+      // if the game is active, get new maze state and move pony and domokun accordingly
       const mazeState = await this.mazeService.getMazeState(this.currentGame.id).toPromise();
       this.currentGame.pony = mazeState.pony[0];
       this.currentGame.domokun = mazeState.domokun[0];
+
       if (moveResponse['state-result'] !== 'Move accepted') {
-        this.toastr.info(moveResponse['state-result']);
+        // if the move was not accepted, show toast message
+        const toast = this.toastr.info(moveResponse['state-result']);
+        this.activeToastId = toast.toastId;
       }
+
     } else {
+      // if game is not active anymore, open the EndGame dialog
       this.openEndGameDialog(moveResponse['state-result']);
     }
   }
@@ -66,6 +78,7 @@ export class PlayAreaComponent implements OnInit {
       data: { message }
     });
 
+    // after the dialog is closed, either restart the game or show the home page
     dialogref.afterClosed().subscribe((playAgain: boolean) => {
       if (playAgain) {
         this.restartGame();
@@ -88,6 +101,7 @@ export class PlayAreaComponent implements OnInit {
     const { maze_id } = await this.mazeService.createMaze(newGameData).toPromise();
     this.storage.mazeId = maze_id;
 
+    // show the current state of the newly created game
     this.getCurrentState();
   }
 
@@ -95,12 +109,14 @@ export class PlayAreaComponent implements OnInit {
    * Make request to get the current state of the maze.
    */
   async getCurrentState() {
+    // if there is not mazeId, return to home page
     if (!this.storage.mazeId) {
       return this.router.navigate(['/home']);
     }
 
     const mazeState = await this.mazeService.getMazeState(this.storage.mazeId).toPromise();
 
+    // save the new game inside a variable
     this.currentGame = {
       id: mazeState.maze_id,
       pony: mazeState.pony[0],
@@ -140,11 +156,4 @@ export class PlayAreaComponent implements OnInit {
     }
     return hasBorder ? '1px solid' : 'none';
   }
-}
-
-enum KEY_CODE {
-  UP_ARROW = 38,
-  DOWN_ARROW = 40,
-  RIGHT_ARROW = 39,
-  LEFT_ARROW = 37
 }

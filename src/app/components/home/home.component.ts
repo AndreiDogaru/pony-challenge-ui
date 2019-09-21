@@ -32,12 +32,18 @@ export class HomeComponent implements OnInit {
       'maze-player-name': 'Rarity',
       difficulty: this.difficulty
     };
-    const a = await this.mazeService.createMaze(newGameData).toPromise();
-    console.log(a);
+    const { maze_id } = await this.mazeService.createMaze(newGameData).toPromise();
 
-    // if (maze_id) {
-    //   this.storage.mazeId = maze_id;
-    //   this.router.navigate(['/play']);
-    // }
+    if (maze_id) {
+      this.storage.mazeId = maze_id;
+      this.router.navigate(['/play']);
+    }
+  }
+
+  /**
+   * Check if the action button is disabled or not.
+   */
+  isBtnDisabled(): boolean {
+    return !this.width || !this.height;
   }
 }
