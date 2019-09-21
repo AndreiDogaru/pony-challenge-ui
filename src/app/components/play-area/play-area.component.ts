@@ -28,8 +28,14 @@ export class PlayAreaComponent implements OnInit {
     ) { }
 
   ngOnInit() {
+    // Go back to home screen if there is no mazeid inside storage
+    if (!this.storage.mazeId) {
+      this.router.navigate(['/home']);
+    }
+
     this.innerWidth = window.innerWidth;
     this.innerHeight = window.innerHeight;
+
     this.getCurrentState();
   }
 

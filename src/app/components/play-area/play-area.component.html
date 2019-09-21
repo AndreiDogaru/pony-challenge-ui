@@ -1,30 +1,28 @@
-<!-- <div class="play_area_container"> -->
+<div 
+  class="play_area" 
+  *ngIf="currentGame"
+  [ngStyle]="{ 'max-width.px': getCellSize() * currentGame.size.width }"
+  >
   <div 
-    class="play_area" 
-    *ngIf="currentGame"
-    [ngStyle]="{ 'max-width.px': getCellSize() * currentGame.size.width }"
-    >
-    <div 
-      class="item" 
-      *ngFor="let item of currentGame.data; let i=index"
-      [ngClass]="{ 
-        'pony': currentGame.pony === i,
-        'domokun': currentGame.domokun === i,
-        'exit': currentGame.exit === i
-      }"
-      [ngStyle]="{
-        'border-top': getBorder('north', item, i),
-        'border-bottom': getBorder('south', item, i),
-        'border-left': getBorder('west', item, i),
-        'border-right': getBorder('east', item, i),
-        'width': getCellSize() + 'px',
-        'height': getCellSize() + 'px',
-        'font-size': getCellFontSize()
-      }"
-    >
-      <p class="pony" *ngIf="currentGame.pony === i">P</p>
-      <p class="domokun" *ngIf="currentGame.domokun === i">D</p>
-      <p class="exit" *ngIf="currentGame.exit === i">E</p>
-    </div>
+    class="item" 
+    *ngFor="let item of currentGame.data; let i=index"
+    [ngClass]="{ 
+      'pony': currentGame.pony === i,
+      'domokun': currentGame.domokun === i,
+      'exit': currentGame.exit === i
+    }"
+    [ngStyle]="{
+      'border-top': getBorder('north', item, i),
+      'border-bottom': getBorder('south', item, i),
+      'border-left': getBorder('west', item, i),
+      'border-right': getBorder('east', item, i),
+      'width': getCellSize() + 'px',
+      'height': getCellSize() + 'px',
+      'font-size': getCellFontSize()
+    }"
+  >
+    <p class="pony" *ngIf="currentGame.pony === i">P</p>
+    <p class="domokun" *ngIf="currentGame.domokun === i">D</p>
+    <p class="exit" *ngIf="currentGame.exit === i">E</p>
   </div>
-<!-- </div> -->
+</div>
