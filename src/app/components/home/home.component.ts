@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { MazeService } from 'src/app/services/maze.service';
+import { StorageService } from 'src/app/services/storage.service';
 
 @Component({
   selector: 'app-home',
@@ -6,10 +10,34 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
+  width: number;
+  height: number;
+  difficulty: number;
 
-  constructor() { }
+  constructor(
+    private router: Router,
+    private mazeService: MazeService,
+    private storage: StorageService,
+  ) { }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  /**
+   * Make request to create a new game.
+   */
+  async initGame() {
+    const newGameData = {
+      'maze-width': this.width,
+      'maze-height': this.height,
+      'maze-player-name': 'Rarity',
+      difficulty: this.difficulty
+    };
+    const a = await this.mazeService.createMaze(newGameData).toPromise();
+    console.log(a);
+
+    // if (maze_id) {
+    //   this.storage.mazeId = maze_id;
+    //   this.router.navigate(['/play']);
+    // }
   }
-
 }

@@ -1,1 +1,15 @@
-<p>home works!</p>
+<div class="home_container">
+  <p class="title">
+    Welcome to the Pony Maze Challenge. Try to save the pony <b>Rarity</b> from the dangerous Domokun.
+  </p>
+
+  <p>Please select your configuration below:</p>
+
+  <div class="inputs_container">
+    <input type="number" [(ngModel)]="width" placeholder="Maze width" min="15" max="25">
+    <input type="number" [(ngModel)]="height" placeholder="Maze height" min="15" max="25">
+    <input type="number" [(ngModel)]="difficulty" placeholder="Difficulty" min="0" max="10">
+
+    <button (click)="initGame()">Play</button>
+  </div>
+</div>

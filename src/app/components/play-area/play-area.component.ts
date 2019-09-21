@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import Game from 'src/app/models/Game';
 import { MazeService } from 'src/app/services/maze.service';
+import { StorageService } from 'src/app/services/storage.service';
 import { GameOverDialogComponent } from 'src/app/dialogs/game-over/game-over.component';
 
 @Component({
@@ -20,10 +21,11 @@ export class PlayAreaComponent implements OnInit {
     private toastr: ToastrService,
     private dialog: MatDialog,
     private mazeService: MazeService,
+    private storage: StorageService,
     ) { }
 
   ngOnInit() {
-    this.initGame();
+    this.getCurrentState();
   }
 
   // Listen for keyup events and make req to move the pony
@@ -66,7 +68,7 @@ export class PlayAreaComponent implements OnInit {
 
     dialogref.afterClosed().subscribe((playAgain: boolean) => {
       if (playAgain) {
-        this.initGame();
+        this.restartGame();
       } else {
         this.router.navigate(['/home']);
       }
@@ -74,18 +76,30 @@ export class PlayAreaComponent implements OnInit {
   }
 
   /**
-   * Make request to create a new game and get the current state of the maze.
+   * Make request to create new game with the same configuration.
    */
-  async initGame() {
+  async restartGame() {
     const newGameData = {
-      'maze-width': 15,
-      'maze-height': 15,
+      'maze-width': this.currentGame.size.width,
+      'maze-height': this.currentGame.size.height,
       'maze-player-name': 'Rarity',
-      difficulty: 10
+      difficulty: 1
     };
     const { maze_id } = await this.mazeService.createMaze(newGameData).toPromise();
+    this.storage.mazeId = maze_id;
 
-    const mazeState = await this.mazeService.getMazeState(maze_id).toPromise();
+    this.getCurrentState();
+  }
+
+  /**
+   * Make request to get the current state of the maze.
+   */
+  async getCurrentState() {
+    if (!this.storage.mazeId) {
+      return this.router.navigate(['/home']);
+    }
+
+    const mazeState = await this.mazeService.getMazeState(this.storage.mazeId).toPromise();
 
     this.currentGame = {
       id: mazeState.maze_id,
