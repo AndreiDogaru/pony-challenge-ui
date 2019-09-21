@@ -5,3 +5,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+
+## Project
+
+The `master` branch contains code that is accesing Trustpilot's Pony API.
+Checkout `feature/new-api` for working with the API created by me.
